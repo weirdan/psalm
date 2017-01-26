@@ -876,4 +876,79 @@ class ArrayAssignmentTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('string', (string) $context->vars_in_scope['$d']);
         $this->assertEquals('int', (string) $context->vars_in_scope['$e']);
     }
+
+    /**
+     * @return void
+     */
+    public function testObjectLikeIntKeyGeneration()
+    {
+        $stmts = self::$parser->parse('<?php
+        $a = ["hello", 5];
+        $a_values = array_values($a);
+
+        $f = [];
+        $f[0] = "hello";
+        $f[1] = 3;
+        ');
+
+        $file_checker = new FileChecker('somefile.php', $this->project_checker, $stmts);
+        $context = new Context();
+        $file_checker->visitAndAnalyzeMethods($context);
+        $this->assertEquals('array{0: string, 1: int}', (string) $context->vars_in_scope['$a']);
+        $this->assertEquals('array<int, string|int>', (string) $context->vars_in_scope['$a_values']);
+        $this->assertEquals('array<int, string|int>', (string) $context->vars_in_scope['$b']);
+        $this->assertEquals('array<int, int>', (string) $context->vars_in_scope['$c']);
+        $this->assertEquals('array<int, string|int>', (string) $context->vars_in_scope['$d']);
+        $this->assertEquals('array<int, string|int>', (string) $context->vars_in_scope['$e']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testObjectLikeIntKeyIncrementalAddition()
+    {
+        $stmts = self::$parser->parse('<?php
+        $f = [];
+        $f[0] = "hello";
+        $f[1] = 3;
+        ');
+
+        $file_checker = new FileChecker('somefile.php', $this->project_checker, $stmts);
+        $context = new Context();
+        $file_checker->visitAndAnalyzeMethods($context);
+        $this->assertEquals('array{0: string, 1: int}', (string) $context->vars_in_scope['$f']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testObjectLikeIntKeyArrayMerge()
+    {
+        $stmts = self::$parser->parse('<?php
+        $d = array_merge(["hello", 5], []);
+        $e = array_merge(["hello", 5], [3]);
+        ');
+
+        $file_checker = new FileChecker('somefile.php', $this->project_checker, $stmts);
+        $context = new Context();
+        $file_checker->visitAndAnalyzeMethods($context);
+        $this->assertEquals('array<int, int|string>', (string) $context->vars_in_scope['$d']);
+        $this->assertEquals('array<int, int|string>', (string) $context->vars_in_scope['$e']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testObjectLikeIntKeyUpdateEntry()
+    {
+        $stmts = self::$parser->parse('<?php
+        $c = ["hello", 5];
+        $c[0] = 3;
+        ');
+
+        $file_checker = new FileChecker('somefile.php', $this->project_checker, $stmts);
+        $context = new Context();
+        $file_checker->visitAndAnalyzeMethods($context);
+        $this->assertEquals('array<int, int>', (string) $context->vars_in_scope['$c']);
+    }
 }
