@@ -185,6 +185,14 @@ class IssueBuffer
         self::$issues_data = array_merge($issues_data, self::$issues_data);
     }
 
+    public static function clear()
+    {
+        $current_data = self::$issue_data;
+        self::$issue_data = [];
+        self::$emitted = [];
+        return $current_data;
+    }
+
     /**
      * @param  bool                 $is_full
      * @param  int|null             $start_time
