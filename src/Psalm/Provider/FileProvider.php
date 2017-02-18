@@ -1,6 +1,10 @@
 <?php
 namespace Psalm\Provider;
 
+use PhpParser;
+use Psalm\Checker\ProjectChecker;
+use Psalm\LanguageServer\NodeVisitor\{ColumnCalculator, ReferencesAdder};
+
 class FileProvider
 {
     /**

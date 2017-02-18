@@ -1647,6 +1647,7 @@ class ProjectChecker
     {
         return StatementsProvider::getStatementsForFile(
             $file_path,
+            $this,
             $this->file_provider,
             $this->cache_provider,
             $this->debug_output

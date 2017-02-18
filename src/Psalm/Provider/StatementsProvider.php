@@ -18,6 +18,7 @@ class StatementsProvider
      */
     public static function getStatementsForFile(
         $file_path,
+        ProjectChecker $project_checker,
         FileProvider $file_provider,
         CacheProvider $cache_provider,
         $debug_output = false
@@ -26,7 +27,7 @@ class StatementsProvider
 
         $from_cache = false;
 
-        $version = 'parsercache4';
+        $version = 'parsercache4' . ($project_checker->server_mode ? 'server' : '');
 
         $file_contents = $file_provider->getContents($file_path);
         $modified_time = $file_provider->getModifiedTime($file_path);
@@ -46,7 +47,7 @@ class StatementsProvider
                 echo 'Parsing ' . $file_path . PHP_EOL;
             }
 
-            $stmts = self::parseStatementsInFile($file_contents);
+            $stmts = self::parseStatementsInFile($project_checker, $file_contents);
         } else {
             $from_cache = true;
         }
@@ -65,7 +66,7 @@ class StatementsProvider
      *
      * @return array<int, \PhpParser\Node\Stmt>
      */
-    private static function parseStatementsInFile($file_contents)
+    private static function parseStatementsInFile(ProjectChecker $project_checker, $file_contents)
     {
         if (!self::$parser) {
             $lexer = version_compare(PHP_VERSION, '7.0.0dev', '>=')
@@ -92,6 +93,18 @@ class StatementsProvider
             foreach ($error_handler->getErrors() as $error) {
                 throw $error;
             }
+        }
+
+        if ($project_checker->server_mode) {
+            $traverser = new PhpParser\NodeTraverser;
+
+            // Add parentNode, previousSibling, nextSibling attributes
+            $traverser->addVisitor(new ReferencesAdder());
+
+            // Add column attributes to nodes
+            $traverser->addVisitor(new ColumnCalculator($file_contents));
+
+            $traverser->traverse($stmts);
         }
 
         return $stmts;
