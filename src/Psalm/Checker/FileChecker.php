@@ -49,11 +49,6 @@ class FileChecker extends SourceChecker implements StatementsSource
     protected $namespace_aliased_classes_flipped = [];
 
     /**
-     * @var array<int, \PhpParser\Node\Stmt>
-     */
-    protected $preloaded_statements = [];
-
-    /**
      * @var bool
      */
     public static $show_notices = true;
@@ -106,6 +101,11 @@ class FileChecker extends SourceChecker implements StatementsSource
     public $will_analyze;
 
     /**
+     * @var array<int, PhpParser\Node\Stmt>|null
+     */
+    public $stmts;
+
+    /**
      * @param string                                $file_path
      * @param ProjectChecker                        $project_checker
      * @param bool                                  $will_analyze
@@ -142,6 +142,10 @@ class FileChecker extends SourceChecker implements StatementsSource
         $traverser = new PhpParser\NodeTraverser();
         $traverser->addVisitor(new \Psalm\Visitor\DependencyFinderVisitor($this->project_checker, $this));
         $traverser->traverse($stmts);
+
+        if ($this->will_analyze) {
+            $this->stmts = $stmts;
+        }
     }
 
     /**
@@ -204,6 +208,7 @@ class FileChecker extends SourceChecker implements StatementsSource
         }
 
         // check any leftover classes not already evaluated
+
         foreach ($this->class_checkers_to_analyze as $class_checker) {
             $class_checker->analyze(null, $this->context, $update_docblocks);
         }
@@ -404,7 +409,7 @@ class FileChecker extends SourceChecker implements StatementsSource
      */
     public function getStatements()
     {
-        return $this->project_checker->getStatementsForFile($this->file_path);
+        return $this->stmts ?: $this->project_checker->getStatementsForFile($this->file_path);
     }
 
     /**

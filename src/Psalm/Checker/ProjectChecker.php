@@ -264,6 +264,8 @@ class ProjectChecker
     }
 
     /**
+     * @param  string $address
+     * @param  int $port
      * @return void
      */
     public function server($address = '127.0.0.1', $port = 12345)
@@ -322,12 +324,17 @@ class ProjectChecker
                     echo "socket_read() failed: reason: " . socket_strerror(socket_last_error($msgsock)) . "\n";
                     break 2;
                 }
-                if (!$buf = trim($buf)) {
+
+                $buf = trim($buf);
+
+                if (!$buf) {
                     continue;
                 }
+
                 if ($buf === 'quit') {
                     break;
                 }
+
                 if ($buf === 'shutdown') {
                     socket_close($msgsock);
                     break 2;
@@ -340,6 +347,13 @@ class ProjectChecker
                 echo 'Analyzing ' . $file_checker->getFilePath() . PHP_EOL;
 
                 $file_checker->analyze();
+
+                $node = FileProvider::getNodeAtPosition(
+                    $file_checker->getStatements(),
+                    new \LanguageServer\Protocol\Position(191, 19)
+                );
+
+                var_dump($node);
 
                 $response = json_encode(IssueBuffer::clear()) . PHP_EOL;
 
