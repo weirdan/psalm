@@ -27,7 +27,7 @@ class StatementsProvider
 
         $from_cache = false;
 
-        $version = 'parsercache4' . ($project_checker->server_mode ? 'server' : '');
+        $version = 'parsercache4.1' . ($project_checker->server_mode ? 'server' : '');
 
         $file_contents = $file_provider->getContents($file_path);
         $modified_time = $file_provider->getModifiedTime($file_path);
@@ -52,7 +52,7 @@ class StatementsProvider
             $from_cache = true;
         }
 
-        $cache_provider->saveStatementsToCache($file_cache_key, $file_content_hash, $stmts, $from_cache);
+        CacheProvider::saveStatementsToCache($file_cache_key, $file_content_hash, $stmts, $from_cache);
 
         if (!$stmts) {
             return [];
@@ -69,17 +69,17 @@ class StatementsProvider
     private static function parseStatementsInFile(ProjectChecker $project_checker, $file_contents)
     {
         if (!self::$parser) {
+            $attributes = [
+                'comments', 'startLine', 'startFilePos', 'endFilePos',
+            ];
+
+            if ($project_checker->server_mode) {
+                $attributes[] = 'endLine';
+            }
+
             $lexer = version_compare(PHP_VERSION, '7.0.0dev', '>=')
-                ? new PhpParser\Lexer([
-                    'usedAttributes' => [
-                        'comments', 'startLine', 'startFilePos', 'endFilePos',
-                    ],
-                ])
-                : new PhpParser\Lexer\Emulative([
-                    'usedAttributes' => [
-                        'comments', 'startLine', 'startFilePos', 'endFilePos',
-                    ],
-                ]);
+                ? new PhpParser\Lexer([ 'usedAttributes' => $attributes ])
+                : new PhpParser\Lexer\Emulative([ 'usedAttributes' => $attributes ]);
 
             self::$parser = (new PhpParser\ParserFactory())->create(PhpParser\ParserFactory::PREFER_PHP7, $lexer);
         }
@@ -87,7 +87,7 @@ class StatementsProvider
         $error_handler = new \PhpParser\ErrorHandler\Collecting();
 
         /** @var array<int, \PhpParser\Node\Stmt> */
-        $stmts = self::$parser->parse($file_contents, $error_handler);
+        $stmts = $parser->parse($file_contents, $error_handler);
 
         if (!$stmts && $error_handler->hasErrors()) {
             foreach ($error_handler->getErrors() as $error) {
