@@ -51,6 +51,9 @@ class CodeLocation
     /** @var boolean */
     private $have_recalculated = false;
 
+    /** @var self|null */
+    private $secondary_location;
+
     /**
      * @param StatementsSource $statements_source
      * @param \PhpParser\Node  $stmt
@@ -237,5 +240,14 @@ class CodeLocation
         $this->calculateRealLocation();
 
         return [$this->preview_start, $this->preview_end];
+    }
+
+    /**
+     * @param CodeLocation $secondary_location
+     * @return void
+     */
+    public function setSecondaryLocation(CodeLocation $secondary_location)
+    {
+        $this->secondary_location = $secondary_location;
     }
 }
