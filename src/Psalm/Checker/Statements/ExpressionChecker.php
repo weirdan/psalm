@@ -258,17 +258,22 @@ class ExpressionChecker
             }
 
             foreach ($stmt->uses as $use) {
-                // insert the ref into the current context if passed by ref, as whatever we're passing
-                // the closure to could execute it straight away.
-                if (!$context->hasVariable('$' . $use->var) && $use->byRef) {
-                    $context->vars_in_scope['$' . $use->var] = Type::getMixed();
+                if (is_string($use->var->name)) {
+                    $use_var_id = '$' . $use->var->name;
+
+                    // insert the ref into the current context if passed by ref, as whatever we're passing
+                    // the closure to could execute it straight away.
+                    if (!$context->hasVariable($use_var_id) && $use->byRef) {
+                        $context->vars_in_scope[$use_var_id] = Type::getMixed();
+                    }
+
+                    $use_context->vars_in_scope[$use_var_id] = $context->hasVariable($use_var_id)
+                        ? clone $context->vars_in_scope[$use_var_id]
+                        : Type::getMixed();
+
+                    $use_context->vars_possibly_in_scope[$use_var_id] = true;
                 }
 
-                $use_context->vars_in_scope['$' . $use->var] = $context->hasVariable('$' . $use->var)
-                    ? clone $context->vars_in_scope['$' . $use->var]
-                    : Type::getMixed();
-
-                $use_context->vars_possibly_in_scope['$' . $use->var] = true;
             }
 
             $closure_checker->analyze($use_context, $context);
@@ -1529,15 +1534,16 @@ class ExpressionChecker
         Context $context
     ) {
         foreach ($stmt->uses as $use) {
-            $use_var_id = '$' . $use->var;
-            if (!$context->hasVariable($use_var_id)) {
+            if (is_string($use->var->name) && !$context->hasVariable('$' . $use->var->name)) {
+                $use_var_id = '$' . $use->var->name;
+
                 if ($use->byRef) {
                     $context->vars_in_scope[$use_var_id] = Type::getMixed();
                     $context->vars_possibly_in_scope[$use_var_id] = true;
-
-                    if (!$statements_checker->hasVariable($use_var_id)) {
-                        $statements_checker->registerVariable($use_var_id, new CodeLocation($statements_checker, $use));
-                    }
+                    $statements_checker->registerVariable(
+                        $use_var_id,
+                        new CodeLocation($statements_checker->getSource(), $use->var)
+                    );
                     return;
                 }
 
@@ -1546,7 +1552,7 @@ class ExpressionChecker
                         IssueBuffer::add(
                             new UndefinedVariable(
                                 'Cannot find referenced variable ' . $use_var_id,
-                                new CodeLocation($statements_checker->getSource(), $use)
+                                new CodeLocation($statements_checker->getSource(), $use->var)
                             )
                         );
 
@@ -1561,7 +1567,7 @@ class ExpressionChecker
                         new PossiblyUndefinedVariable(
                             'Possibly undefined variable ' . $use_var_id . ', first seen on line ' .
                                 $first_appearance->getLineNumber(),
-                            new CodeLocation($statements_checker->getSource(), $use)
+                            new CodeLocation($statements_checker->getSource(), $use->var)
                         ),
                         $statements_checker->getSuppressedIssues()
                     )) {
@@ -1575,7 +1581,7 @@ class ExpressionChecker
                     IssueBuffer::add(
                         new UndefinedVariable(
                             'Cannot find referenced variable ' . $use_var_id,
-                            new CodeLocation($statements_checker->getSource(), $use)
+                            new CodeLocation($statements_checker->getSource(), $use->var)
                         )
                     );
 

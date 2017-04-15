@@ -40,8 +40,11 @@ class EffectsAnalyser
                         $return_types[] = new Atomic\TMixed();
                     }
                 }
-            } elseif ($stmt instanceof PhpParser\Node\Expr\Yield_ || $stmt instanceof PhpParser\Node\Expr\YieldFrom) {
-                $yield_types = array_merge($yield_types, self::getYieldTypeFromExpression($stmt));
+            } elseif ($stmt instanceof PhpParser\Node\Stmt\Expression &&
+                ($stmt->expr instanceof PhpParser\Node\Expr\Yield_ ||
+                    $stmt->expr instanceof PhpParser\Node\Expr\YieldFrom)
+            ) {
+                $yield_types = array_merge($yield_types, self::getYieldTypeFromExpression($stmt->expr));
             } elseif ($stmt instanceof PhpParser\Node\Stmt\If_) {
                 $return_types = array_merge($return_types, self::getReturnTypes($stmt->stmts, $yield_types));
 
@@ -60,7 +63,10 @@ class EffectsAnalyser
                 }
 
                 if ($stmt->finally) {
-                    $return_types = array_merge($return_types, self::getReturnTypes($stmt->finally->stmts, $yield_types));
+                    $return_types = array_merge(
+                        $return_types,
+                        self::getReturnTypes($stmt->finally->stmts, $yield_types)
+                    );
                 }
             } elseif ($stmt instanceof PhpParser\Node\Stmt\For_) {
                 $return_types = array_merge($return_types, self::getReturnTypes($stmt->stmts, $yield_types));

@@ -29,11 +29,11 @@ abstract class Plugin
     /**
      * Checks a statement
      *
-     * @param  StatementsChecker                        $statements_checker
-     * @param  PhpParser\Node\Stmt|PhpParser\Node\Expr  $stmt
-     * @param  Context                                  $context
-     * @param  CodeLocation                             $code_location
-     * @param  array                                    $suppressed_issues
+     * @param  StatementsChecker    $statements_checker
+     * @param  PhpParser\Node\Stmt  $stmt
+     * @param  Context              $context
+     * @param  CodeLocation         $code_location
+     * @param  array                $suppressed_issues
      * @return null|false
      */
     public function checkStatement(

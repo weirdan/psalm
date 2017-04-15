@@ -409,6 +409,10 @@ class FetchChecker
         PhpParser\Node\Expr\ClassConstFetch $stmt,
         Context $context
     ) {
+        if (!is_string($stmt->name)) {
+            throw new \UnexpectedValueException('Class constant name must be a string');
+        }
+
         if ($context->check_consts &&
             $stmt->class instanceof PhpParser\Node\Name &&
             $stmt->class->parts !== ['static'] &&

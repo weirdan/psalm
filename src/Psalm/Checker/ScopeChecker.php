@@ -8,9 +8,9 @@ class ScopeChecker
     /**
      * Do all code paths in this list of statements exit the block (return/throw)
      *
-     * @param  array<PhpParser\Node\Stmt|PhpParser\Node\Expr>  $stmts
-     * @param  bool                                            $check_continue - also looks for a continue
-     * @param  bool                                            $check_break
+     * @param  array<PhpParser\Node\Stmt>  $stmts
+     * @param  bool                        $check_continue - also looks for a continue
+     * @param  bool                        $check_break
      * @return bool
      */
     public static function doesLeaveBlock(array $stmts, $check_continue = true, $check_break = true)
@@ -24,7 +24,7 @@ class ScopeChecker
 
             if ($stmt instanceof PhpParser\Node\Stmt\Return_ ||
                 $stmt instanceof PhpParser\Node\Stmt\Throw_ ||
-                $stmt instanceof PhpParser\Node\Expr\Exit_ ||
+                ($stmt instanceof PhpParser\Node\Stmt\Expression && $stmt->expr instanceof PhpParser\Node\Expr\Exit_) ||
                 ($check_continue && $stmt instanceof PhpParser\Node\Stmt\Continue_) ||
                 ($check_break && $stmt instanceof PhpParser\Node\Stmt\Break_)
             ) {
@@ -255,7 +255,7 @@ class ScopeChecker
 
             if ($stmt instanceof PhpParser\Node\Stmt\Return_ ||
                 $stmt instanceof PhpParser\Node\Stmt\Throw_ ||
-                $stmt instanceof PhpParser\Node\Expr\Exit_
+                ($stmt instanceof PhpParser\Node\Stmt\Expression && $stmt->expr instanceof PhpParser\Node\Expr\Exit_)
             ) {
                 return true;
             }

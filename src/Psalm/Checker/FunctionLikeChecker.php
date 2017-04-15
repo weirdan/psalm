@@ -101,7 +101,7 @@ abstract class FunctionLikeChecker extends SourceChecker implements StatementsSo
      */
     public function analyze(Context $context, Context $global_context = null, $add_mutations = false)
     {
-        /** @var array<PhpParser\Node\Expr|PhpParser\Node\Stmt> */
+        /** @var array<PhpParser\Node\Stmt> */
         $function_stmts = $this->function->getStmts() ?: [];
 
         $hash = null;
@@ -606,7 +606,7 @@ abstract class FunctionLikeChecker extends SourceChecker implements StatementsSo
             if (isset($storage->param_types[$param_array->name])) {
                 if (IssueBuffer::accepts(
                     new DuplicateParam(
-                        'Duplicate param $' . $param->name . ' in docblock for ' . $cased_function_id,
+                        'Duplicate param $' . $param_array->name . ' in docblock for ' . $cased_function_id,
                         new CodeLocation($source, $param, true)
                     ),
                     $source->getSuppressedIssues()
@@ -624,7 +624,7 @@ abstract class FunctionLikeChecker extends SourceChecker implements StatementsSo
                 if (!$param->variadic && $has_optional_param) {
                     if (IssueBuffer::accepts(
                         new MisplacedRequiredParam(
-                            'Required param $' . $param->name . ' should come before any optional params in ' .
+                            'Required param $' . $param_array->name . ' should come before any optional params in ' .
                             $cased_function_id,
                             new CodeLocation($source, $param, true)
                         ),
@@ -645,12 +645,13 @@ abstract class FunctionLikeChecker extends SourceChecker implements StatementsSo
         if ($function->stmts) {
             // look for constant declarations
             foreach ($function->stmts as $stmt) {
-                if ($stmt instanceof PhpParser\Node\Expr\FuncCall &&
-                    $stmt->name instanceof PhpParser\Node\Name &&
-                    $stmt->name->parts === ['define']
+                if ($stmt instanceof PhpParser\Node\Stmt\Expression &&
+                    $stmt->expr instanceof PhpParser\Node\Expr\FuncCall &&
+                    $stmt->expr->name instanceof PhpParser\Node\Name &&
+                    $stmt->expr->name->parts === ['define']
                 ) {
-                    $first_arg_value = isset($stmt->args[0]) ? $stmt->args[0]->value : null;
-                    $second_arg_value = isset($stmt->args[1]) ? $stmt->args[1]->value : null;
+                    $first_arg_value = isset($stmt->expr->args[0]) ? $stmt->expr->args[0]->value : null;
+                    $second_arg_value = isset($stmt->expr->args[1]) ? $stmt->expr->args[1]->value : null;
 
                     if ($first_arg_value instanceof PhpParser\Node\Scalar\String_ && $second_arg_value) {
                         $storage->defined_constants[$first_arg_value->value] =
@@ -1426,8 +1427,12 @@ abstract class FunctionLikeChecker extends SourceChecker implements StatementsSo
 
         $is_optional = $param->default !== null;
 
+        if (!is_string($param->var->name)) {
+            throw new \UnexpectedValueException('Not expecting param name to be non-string');
+        }
+
         return new FunctionLikeParameter(
-            $param->name,
+            $param->var->name,
             $param->byRef,
             $param_type ?: Type::getMixed(),
             new CodeLocation($source, $param, false, self::PARAM_TYPE_REGEX),
