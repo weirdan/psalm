@@ -142,7 +142,7 @@ class EffectsAnalyser
      * @param   PhpParser\Node\Expr $stmt
      * @return  array<int, Atomic>
      */
-    protected static function getYieldTypeFromExpression($stmt)
+    protected static function getYieldTypeFromExpression(PhpParser\Node\Expr $stmt)
     {
         if ($stmt instanceof PhpParser\Node\Expr\Yield_) {
             $key_type = null;
