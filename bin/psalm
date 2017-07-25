@@ -330,7 +330,7 @@ if ($path_to_config) {
 \Psalm\IssueBuffer::setStartTime(microtime(true));
 
 if (array_key_exists('server', $options)) {
-    $project_checker->server();
+    $project_checker->server($current_dir);
 } elseif (array_key_exists('self-check', $options)) {
     $project_checker->checkDir(dirname(__DIR__) . '/src', dirname(__DIR__));
 } elseif ($paths_to_check === null) {

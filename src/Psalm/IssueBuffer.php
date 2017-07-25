@@ -190,8 +190,8 @@ class IssueBuffer
      */
     public static function clear()
     {
-        $current_data = self::$issue_data;
-        self::$issue_data = [];
+        $current_data = self::$issues_data;
+        self::$issues_data = [];
         self::$emitted = [];
         return $current_data;
     }

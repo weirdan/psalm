@@ -3,7 +3,6 @@ namespace Psalm\Provider;
 
 use PhpParser;
 use Psalm\Checker\ProjectChecker;
-use Psalm\LanguageServer\NodeVisitor\{ColumnCalculator, ReferencesAdder};
 
 class FileProvider
 {
@@ -35,20 +34,5 @@ class FileProvider
     public function fileExists($file_path)
     {
         return file_exists($file_path);
-    }
-
-    /**
-     * Returns the node at a specified position
-     * @param array<PhpParser\Node> $stmts
-     * @param \Psalm\LanguageServer\Protocol\Position $position
-     * @return PhpParser\Node|null
-     */
-    public static function getNodeAtPosition(array $stmts, \Psalm\LanguageServer\Protocol\Position $position)
-    {
-        $traverser = new PhpParser\NodeTraverser;
-        $finder = new \Psalm\LanguageServer\NodeVisitor\NodeAtPositionFinder($position);
-        $traverser->addVisitor($finder);
-        $traverser->traverse($stmts);
-        return $finder->node;
     }
 }

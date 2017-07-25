@@ -2,6 +2,8 @@
 namespace Psalm\Provider;
 
 use PhpParser;
+use Psalm\Checker\ProjectChecker;
+use Psalm\LanguageServer\NodeVisitor\{ColumnCalculator, ReferencesAdder};
 
 class StatementsProvider
 {
@@ -27,7 +29,7 @@ class StatementsProvider
 
         $from_cache = false;
 
-        $version = 'parsercache4.1' . ($project_checker->server_mode ? 'server' : '');
+        $version = 'parsercache4.11' . ($project_checker->server_mode ? 'server' : '');
 
         $file_contents = $file_provider->getContents($file_path);
         $modified_time = $file_provider->getModifiedTime($file_path);
@@ -52,7 +54,7 @@ class StatementsProvider
             $from_cache = true;
         }
 
-        CacheProvider::saveStatementsToCache($file_cache_key, $file_content_hash, $stmts, $from_cache);
+        $cache_provider->saveStatementsToCache($file_cache_key, $file_content_hash, $stmts, $from_cache);
 
         if (!$stmts) {
             return [];
@@ -87,7 +89,7 @@ class StatementsProvider
         $error_handler = new \PhpParser\ErrorHandler\Collecting();
 
         /** @var array<int, \PhpParser\Node\Stmt> */
-        $stmts = $parser->parse($file_contents, $error_handler);
+        $stmts = self::$parser->parse($file_contents, $error_handler);
 
         if (!$stmts && $error_handler->hasErrors()) {
             foreach ($error_handler->getErrors() as $error) {
@@ -98,9 +100,6 @@ class StatementsProvider
         if ($project_checker->server_mode) {
             $traverser = new PhpParser\NodeTraverser;
 
-            // Add parentNode, previousSibling, nextSibling attributes
-            $traverser->addVisitor(new ReferencesAdder());
-
             // Add column attributes to nodes
             $traverser->addVisitor(new ColumnCalculator($file_contents));
 
@@ -108,5 +107,20 @@ class StatementsProvider
         }
 
         return $stmts;
+    }
+
+    /**
+     * Returns the node at a specified position
+     * @param array<PhpParser\Node> $stmts
+     * @param \Psalm\LanguageServer\Protocol\Position $position
+     * @return PhpParser\Node|null
+     */
+    public static function getNodeAtPosition(array $stmts, \Psalm\LanguageServer\Protocol\Position $position)
+    {
+        $traverser = new PhpParser\NodeTraverser;
+        $finder = new \Psalm\LanguageServer\NodeVisitor\NodeAtPositionFinder($position);
+        $traverser->addVisitor($finder);
+        $traverser->traverse($stmts);
+        return $finder->node;
     }
 }

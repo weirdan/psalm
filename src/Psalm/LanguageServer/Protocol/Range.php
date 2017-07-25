@@ -32,8 +32,8 @@ class Range
     public static function fromNode(Node $node)
     {
         return new self(
-            new Position($node->getAttribute('startLine') - 1, $node->getAttribute('startColumn') - 1),
-            new Position($node->getAttribute('endLine') - 1, $node->getAttribute('endColumn'))
+            new Position($node->getAttribute('startLine'), $node->getAttribute('startColumn') - 1),
+            new Position($node->getAttribute('endLine'), $node->getAttribute('endColumn'))
         );
     }
 
@@ -46,8 +46,8 @@ class Range
      */
     public static function fromError(Error $error, string $content)
     {
-        $startLine   = max($error->getStartLine() - 1, 0);
-        $endLine     = max($error->getEndLine() - 1, $startLine);
+        $startLine   = max($error->getStartLine(), 0);
+        $endLine     = max($error->getEndLine(), $startLine);
         $startColumn = $error->hasColumnInfo() ? $error->getStartColumn($content) - 1 : 0;
         $endColumn   = $error->hasColumnInfo() ? $error->getEndColumn($content) : 0;
         return new self(new Position($startLine, $startColumn), new Position($endLine, $endColumn));

@@ -264,11 +264,12 @@ class ProjectChecker
     }
 
     /**
+     * @param  string $base_dir
      * @param  string $address
      * @param  int $port
      * @return void
      */
-    public function server($address = '127.0.0.1', $port = 12345)
+    public function server($base_dir, $address = '127.0.0.1', $port = 12345)
     {
         $this->server_mode = true;
 
@@ -279,16 +280,24 @@ class ProjectChecker
         }
 
         if (!$this->config) {
-            $this->config = $this->getConfigForPath($cwd);
+            $this->config = $this->getConfigForPath($base_dir, $cwd);
         }
+
+        echo 'Gathering project files...' . PHP_EOL;
 
         foreach ($this->config->getProjectDirectories() as $dir_name) {
             $this->checkDirWithConfig($dir_name, $this->config);
         }
 
-        $this->visitFiles();
+        echo 'Scanning files...' . PHP_EOL;
+
+        $this->scanFiles();
+
+        echo 'Project is ready for querying' . PHP_EOL;
 
         $this->output_format = self::TYPE_JSON;
+
+        $filetype_handlers = $this->config->getFiletypeHandlers();
 
         /* Allow the script to hang around waiting for connections. */
         set_time_limit(0);
@@ -340,20 +349,25 @@ class ProjectChecker
                     break 2;
                 }
 
-                $filetype_handlers = $this->config->getFiletypeHandlers();
+                $buf_parts = explode(':', $buf);
 
-                $file_checker = $this->visitFile(realpath($buf), $filetype_handlers, true);
+                $file_checker = $this->getFile(realpath($buf_parts[0]), $filetype_handlers, true);
 
                 echo 'Analyzing ' . $file_checker->getFilePath() . PHP_EOL;
 
-                $file_checker->analyze();
+                $file_checker->analyze(null, false, false, true);
 
-                $node = FileProvider::getNodeAtPosition(
+                $line_number = (int)$buf_parts[1];
+                $column = (int)$buf_parts[2];
+
+                echo 'Getting node at position ' . $line_number . ':' . $column;
+
+                $node = StatementsProvider::getNodeAtPosition(
                     $file_checker->getStatements(),
-                    new \Psalm\LanguageServer\Protocol\Position(191, 19)
+                    new \Psalm\LanguageServer\Protocol\Position($line_number, $column)
                 );
 
-                $response = json_encode(IssueBuffer::clear()) . PHP_EOL;
+                $response = (string)$node->inferredType . PHP_EOL;
 
                 socket_write($msgsock, $response, strlen($response));
                 echo "$buf\n";

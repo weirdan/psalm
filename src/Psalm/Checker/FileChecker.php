@@ -142,20 +142,21 @@ class FileChecker extends SourceChecker implements StatementsSource
         $traverser = new PhpParser\NodeTraverser();
         $traverser->addVisitor(new \Psalm\Visitor\DependencyFinderVisitor($this->project_checker, $this));
         $traverser->traverse($stmts);
-
-        if ($this->will_analyze) {
-            $this->stmts = $stmts;
-        }
     }
 
     /**
      * @param  bool $update_docblocks
      * @param  bool $preserve_checkers
+     * @param  bool $preserve_statements
      *
      * @return void
      */
-    public function analyze(Context $file_context = null, $update_docblocks = false, $preserve_checkers = false)
-    {
+    public function analyze(
+        Context $file_context = null,
+        $update_docblocks = false,
+        $preserve_checkers = false,
+        $preserve_statements = false
+    ) {
         if ($file_context) {
             $this->context = $file_context;
         }
@@ -248,6 +249,10 @@ class FileChecker extends SourceChecker implements StatementsSource
 
         if ($update_docblocks) {
             \Psalm\Mutator\FileMutator::updateDocblocks($this->file_path);
+        }
+
+        if ($preserve_statements) {
+            $this->stmts = $stmts;
         }
     }
 
