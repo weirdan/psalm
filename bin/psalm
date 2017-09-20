@@ -316,11 +316,20 @@ $project_checker = new ProjectChecker(
     $output_format,
     $threads,
     $debug,
-    $update_docblocks,
-    $find_dead_code || $find_references_to !== null,
-    $find_references_to,
-    isset($options['report'])?$options['report']:null
+    isset($options['report']) ? $options['report'] : null
 );
+
+if ($update_docblocks) {
+    $project_checker->update_docblocks = true;
+}
+
+if ($find_dead_code || $find_references_to) {
+    $project_checker->collect_references = true;
+}
+
+if ($find_references_to) {
+    $project_checker->find_references_to = $find_references_to;
+}
 
 // initialise custom config, if passed
 if ($path_to_config) {

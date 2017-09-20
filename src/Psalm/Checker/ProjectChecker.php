@@ -255,9 +255,6 @@ class ProjectChecker
      * @param string        $output_format
      * @param int           $threads
      * @param bool          $debug_output
-     * @param bool          $update_docblocks
-     * @param bool          $collect_references
-     * @param string        $find_references_to
      * @param string        $reports
      */
     public function __construct(
@@ -268,9 +265,6 @@ class ProjectChecker
         $output_format = self::TYPE_CONSOLE,
         $threads = 1,
         $debug_output = false,
-        $update_docblocks = false,
-        $collect_references = false,
-        $find_references_to = null,
         $reports = null
     ) {
         $this->file_provider = $file_provider;
@@ -279,9 +273,6 @@ class ProjectChecker
         $this->show_info = $show_info;
         $this->debug_output = $debug_output;
         $this->threads = $threads;
-        $this->update_docblocks = $update_docblocks;
-        $this->collect_references = $collect_references;
-        $this->find_references_to = $find_references_to;
 
         if (!in_array($output_format, [self::TYPE_CONSOLE, self::TYPE_JSON, self::TYPE_EMACS, self::TYPE_XML], true)) {
             throw new \UnexpectedValueException('Unrecognised output format ' . $output_format);
