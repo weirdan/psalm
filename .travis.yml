@@ -41,6 +41,7 @@ script:
   - vendor/bin/phpunit
   - ./psalm --find-dead-code
   - vendor/bin/phpcs
+  - bin/build-phar.sh
 
 after_success:
   - travis_retry php vendor/bin/php-coveralls -v
@@ -53,5 +54,5 @@ deploy: # on tag builds with lowest php version and lowest deps
     condition: "$DEPS"
   provider: releases
   api_key:
-    secure: bduWzuD51MVgE0jFENamNZPBuU0OsLTCNNu85xB+PNZQQvavCPc6YSQmnavk+HiwiiUDVYGenF/18IL/yz0TU+yjJ/DYJIrdT/eAq5vUZqeORoc2XdzO6EWnCwR8F7xYwlIxkmewrie0+frabi/wQ/OPGF+zmR0uuGBrkJSAd3m6EnLwJ+8vdJ5uf3VdfB61iTmByEA5ehvRUI7R1GbBSBYX09F6tcaZTk17GDQA/vCNAlxNG/MWZZWta3unqX97N/XcgBdh+AcZY4WqjiIHUctqj0DzfJyo9CHgz9u4UT1a56ZmQWXSWSgstTXfSEnle7wO1NsRIfzvzUB0dGlBi9EOYQko5kkC4Pc1FWK77p+kjwAI6R2LMsJz1xh+AEHAYvWwTnFWRproLI6SsYlM4PkyugR5fY4UF3SjzFr5ODXD3igqGwVuKj3y2jU+0NZH3FWLk9M42rVPAvWA8J+F400XXQnMGdefT00p2mLk/Oye5eqjpBx+7uWGA7/rWIF7McF/gbc+w1h2n8DawCEIeBGh9vgMiVuOymtpZuzXMiWUlApdmWOc34h+2vISrjkRMa7j4bA7DlA4H7cdw8/NPMzCg1I9B0C6ueZbc+6YMoLEkHgvd/mrHO6umadsAjVqJr9KAPDP+TaxaOH3/6FAdyyLTTSg0lY9FTlUqo3Oq2E=
+    secure: "K5CTIZ+wqttYUufNyt5oVYnOVkPu+j+qkqCflw0YdGl50TlWT1nBVZripUjMD8GJkxPLybdbw8a3FUs3n4fsHYXoPMS+bbkY264v+2zCzClTOO4EdxvWZB0nNJo7Z7fDatv+LnFg94U+lYcfSZimQn98zB9P0qxFBsF1kKlTm0sTLwx2d1gik9MElnsBVU4yM6CBnWUa0ist8hp7bRKGyQJ1EDkhR2LunIRitbIbrp0dJwS0BDonejl8BCl1dtzeeTXQRtnUDXfcpx+ZFqkRhEdMeH0qaxHf+wBTK6220X2OCFG9tuDDv89GveIM17/f3i8ObCjrhHsM7FAhxIUn3bu0pxcMqPPvNxDrKRGxTV5Fgqyic12cgA+PudIdBTW671K5DEN3F5cpYNwG2oi7A2tVVNSyr01i7rs6bQh/NkEEGX5NECuC/GYXWgK+kIv9E7X0T/U5On9Rar9g8QFiRVMTrkudycbvtZGP4kQV8Ea1+2l5eU+UHhgUoEM0MxrTmemRvyjE5XiERP9jKNafK6o+5xd0nHhlxG2EWnC5xwjSrtcyGZ9Hqm0qg+2XXm65QxczQLDywD419aRGWzVO28zdI5uBVRsPT23DIOnyB9ySaPtJC68sFPyujXuQ9x1sQjmjxlgey1BmnNlXT/OXurBmdJHkNZaPGWkVmKceSuA="
   file: build/psalm.phar
