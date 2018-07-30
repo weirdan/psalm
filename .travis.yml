@@ -44,3 +44,14 @@ script:
 
 after_success:
   - travis_retry php vendor/bin/php-coveralls -v
+
+deploy: # on tag builds with lowest php version and lowest deps
+  skip_cleanup: true
+  on:
+    tags: true
+    php: 7.0
+    condition: "$DEPS"
+  provider: releases
+  api_key:
+    secure: bduWzuD51MVgE0jFENamNZPBuU0OsLTCNNu85xB+PNZQQvavCPc6YSQmnavk+HiwiiUDVYGenF/18IL/yz0TU+yjJ/DYJIrdT/eAq5vUZqeORoc2XdzO6EWnCwR8F7xYwlIxkmewrie0+frabi/wQ/OPGF+zmR0uuGBrkJSAd3m6EnLwJ+8vdJ5uf3VdfB61iTmByEA5ehvRUI7R1GbBSBYX09F6tcaZTk17GDQA/vCNAlxNG/MWZZWta3unqX97N/XcgBdh+AcZY4WqjiIHUctqj0DzfJyo9CHgz9u4UT1a56ZmQWXSWSgstTXfSEnle7wO1NsRIfzvzUB0dGlBi9EOYQko5kkC4Pc1FWK77p+kjwAI6R2LMsJz1xh+AEHAYvWwTnFWRproLI6SsYlM4PkyugR5fY4UF3SjzFr5ODXD3igqGwVuKj3y2jU+0NZH3FWLk9M42rVPAvWA8J+F400XXQnMGdefT00p2mLk/Oye5eqjpBx+7uWGA7/rWIF7McF/gbc+w1h2n8DawCEIeBGh9vgMiVuOymtpZuzXMiWUlApdmWOc34h+2vISrjkRMa7j4bA7DlA4H7cdw8/NPMzCg1I9B0C6ueZbc+6YMoLEkHgvd/mrHO6umadsAjVqJr9KAPDP+TaxaOH3/6FAdyyLTTSg0lY9FTlUqo3Oq2E=
+  file: build/psalm.phar
