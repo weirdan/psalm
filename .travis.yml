@@ -16,6 +16,9 @@ env:
 matrix:
   allow_failures:
     - php: nightly
+  exclude: # covered in Code coverage stage
+    - php: 7.2
+      env: DEPS=""
 
 cache:
   directories:
@@ -42,14 +45,19 @@ jobs:
   include:
     - stage: Code coverage analysis
       php: 7.2
+      before_install: # don't disable xdebug here
+        - echo memory_limit = 2G >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d
+        - composer clear-cache
       script:
         - vendor/bin/phpunit
       after_success:
         - travis_retry php vendor/bin/php-coveralls -v
+
     - stage: Code style analysis
       php: 7.2
       script:
         - vendor/bin/phpcs
+
     - stage: Phar build
       php: 7.1
       script:
