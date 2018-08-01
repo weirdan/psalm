@@ -1,5 +1,11 @@
 language: php
 
+stages:
+  - Code style analysis
+  - test
+  - Code coverage analysis
+  - Phar build
+
 php:
   - 7.0
   - 7.1
@@ -14,14 +20,13 @@ env:
     - DEFAULT_COMPOSER_FLAGS="--no-interaction --no-suggest --prefer-source"
 
 matrix:
+  fast_finish: true
   allow_failures:
     - php: nightly
-      env: DEPS="high"
-    - php: nightly
-      env: DEPS="low"
   exclude: # covered in Code coverage stage
     - php: 7.2
       env: DEPS="high"
+
 
 cache:
   directories:
@@ -62,16 +67,15 @@ jobs:
       script:
         - vendor/bin/phpcs
 
-    - stage: Phar build
+    - stage: Phar build # always build phar, but only deploy on tag builds
       php: 7.1
+      env: DEPS="low"
       script:
         - bin/build-phar.sh
       deploy:
         skip_cleanup: true
         on:
           tags: true
-          php: 7.1
-          condition: "$DEPS"
         provider: releases
         api_key:
           secure: "E7aVJXRLY0s9m5AA9ozbJUtSvo7Ov/2kusjRWKreLHcjXl5y0dElZYwvv/Zl0/4/5KwNl36hdsOj+UMqiHdZYxgsDhwKhQ5pC59xUEmPl3gtu8kRfkFXesYrm5A0KMh3fU4vzLD7qbv2lY6ax1m5OP0PP6YjTwOsRQMiVbP3TEpnNsDrhEOzQQvmG0NzW1NK/xnaWjzghzsiEBn+oLrKO1x3ykg9iE3gEglg8clQMWN74pRTyIkEJUE93cLdqocpwx3L/SCqZaK2zIy7U1vQ4U5x7WvN22UCdGbuAcqvG+0cTVit8pzfIq93JOk09i19lStSA0+vHVeAOY32icH01q6dlcIxHf66z9ypHnTaRcreUVYMYFHsqbQOy+Sy4zXBdRnF8N2IqWHENT1ib/qI46t7CrknSOmsMlLeyMBRCzdxYaPZFMH0pbHzR9EfrzI0Do5KVUU2ZNxdhJoVh38+6zuaIQOECkoKNY7ijA8QezpjwtxEsEUn2ESCtnAQ5mcDLZqhRbXN4wZ7S63ntIl+zqEltV4PTOujg48MwrBUhgjVhPuUqH9y3crVj+rX4b9G9YEiNoV8kmpD2u2nOc6NLRlDoHHL1eNRs3XPv9bNlzMPF+6h31c0zqGWS5wsT3WB/2Z+huLt4kQFF4cVbhVJqg0zb+thltnM/ANywhRiUnk="
