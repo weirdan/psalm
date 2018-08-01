@@ -46,7 +46,7 @@ jobs:
     - stage: Code coverage analysis
       php: 7.2
       before_install: # don't disable xdebug here
-        - echo memory_limit = 2G >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d
+        - echo memory_limit = 2G >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
         - composer clear-cache
       script:
         - vendor/bin/phpunit
