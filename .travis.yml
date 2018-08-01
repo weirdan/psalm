@@ -19,14 +19,6 @@ env:
   global:
     - DEFAULT_COMPOSER_FLAGS="--no-interaction --no-suggest --prefer-source"
 
-matrix:
-  fast_finish: true
-  allow_failures:
-    - php: nightly
-  exclude: # covered in Code coverage stage
-    - php: 7.2
-      env: DEPS="high"
-
 
 cache:
   directories:
@@ -50,12 +42,25 @@ script:
   - vendor/bin/phpunit --no-coverage
   - ./psalm --find-dead-code
 
+# Base test matrix (php/env)
+matrix:
+  fast_finish: true
+  allow_failures:
+    - php: nightly
+  exclude: # covered in Code coverage stage
+    - php: 7.2
+      env: DEPS="high"
+
+# Additional stages
 jobs:
   include:
     - stage: Code coverage analysis
       php: 7.2
+      env: DEPS="high"
       before_install: # don't disable xdebug here
-        - echo memory_limit = 2G >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+        - export INI_DIR=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d
+        - echo memory_limit = 2G >> $INI_DIR/travis.ini
+        - if [[ -f $INI_DIR/xdebug.ini ]]; then phpenv config-rm xdebug.ini; fi
         - composer clear-cache
       script:
         - vendor/bin/phpunit
@@ -64,6 +69,7 @@ jobs:
 
     - stage: Code style analysis
       php: 7.2
+      env: DEPS="high"
       script:
         - vendor/bin/phpcs
 
