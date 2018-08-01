@@ -16,6 +16,9 @@ env:
 matrix:
   allow_failures:
     - php: nightly
+      env: DEPS="high"
+    - php: nightly
+      env: DEPS="low"
   exclude: # covered in Code coverage stage
     - php: 7.2
       env: DEPS="high"
