@@ -18,6 +18,7 @@ env:
     - DEPS="low"
   global:
     - DEFAULT_COMPOSER_FLAGS="--no-interaction --no-suggest --prefer-source"
+    - XDEBUG="false"
 
 
 cache:
@@ -30,7 +31,7 @@ before_install:
     - export INI=$INI_DIR/travis.ini
     # disable default memory limit
     - echo memory_limit = 2G >> $INI
-    - if [[ -f $INI_DIR/xdebug.ini ]]; then phpenv config-rm xdebug.ini; fi
+    - if [[ "$XDEBUG" = 'false' && -f $INI_DIR/xdebug.ini ]]; then phpenv config-rm xdebug.ini; fi
     - composer clear-cache
 
 install:
@@ -38,8 +39,7 @@ install:
   - if [[ "$DEPS" = 'low' ]]; then travis_retry composer $DEFAULT_COMPOSER_FLAGS --prefer-lowest --prefer-stable update; fi
 
 script:
-  - if [[ "$TRAVIS_ALLOW_FAILURE" = "true" ]]; then false; fi
-  - vendor/bin/phpunit --no-coverage
+  - vendor/bin/phpunit
   - ./psalm --find-dead-code
 
 # Base test matrix (php/env)
@@ -56,14 +56,8 @@ jobs:
   include:
     - stage: Code coverage analysis
       php: 7.2
-      env: DEPS="high"
-      before_install: # don't disable xdebug here
-        - export INI_DIR=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d
-        - echo memory_limit = 2G >> $INI_DIR/travis.ini
-        - if [[ -f $INI_DIR/xdebug.ini ]]; then phpenv config-rm xdebug.ini; fi
-        - composer clear-cache
-      script:
-        - vendor/bin/phpunit
+      # don't disable xdebug here
+      env: DEPS="high" XDEBUG="true"
       after_success:
         - travis_retry php vendor/bin/php-coveralls -v
 
@@ -73,7 +67,8 @@ jobs:
       script:
         - vendor/bin/phpcs
 
-    - stage: Phar build # always build phar, but only deploy on tag builds
+      # always build phar, but only deploy on tag builds
+    - stage: Phar build
       php: 7.1
       env: DEPS="low"
       script:
