@@ -2,6 +2,7 @@
 namespace Psalm;
 
 use Psalm\PluginApi\RegistrationInterface;
+use Psalm\PluginApi\Hook;
 
 class PluginRegistrationSocket implements RegistrationInterface
 {
@@ -29,15 +30,41 @@ class PluginRegistrationSocket implements RegistrationInterface
             throw new \InvalidArgumentException('Plugins must be loaded before registration');
         }
 
-        if (!is_subclass_of($handler, Plugin::class)) {
-            throw new \InvalidArgumentException(
-                'This handler must extend ' . Plugin::class . ' - ' . $handler . ' does not'
-            );
+        if (is_subclass_of($handler, Plugin::class)) {
+            $this->registerPluginDescendant($handler);
+            return;
         }
 
+        if (is_subclass_of($handler, Hook\AfterMethodCallCheckInterface::class)) {
+            $this->config->after_method_checks[$handler] = $handler;
+        }
+
+        if (is_subclass_of($handler, Hook\AfterFunctionCallCheckInterface::class)) {
+            $this->config->after_function_checks[$handler] = $handler;
+        }
+
+        if (is_subclass_of($handler, Hook\AfterExpressionCheckInterface::class)) {
+            $this->config->after_expression_checks[$handler] = $handler;
+        }
+
+        if (is_subclass_of($handler, Hook\AfterStatementCheckInterface::class)) {
+            $this->config->after_statement_checks[$handler] = $handler;
+        }
+
+        if (is_subclass_of($handler, Hook\AfterClassLikeExistsCheckInterface::class)) {
+            $this->config->after_classlike_exists_checks[$handler] = $handler;
+        }
+
+        if (is_subclass_of($handler, Hook\AfterVisitClassLikeInterface::class)) {
+            $this->config->after_visit_classlikes[$handler] = $handler;
+        }
+    }
+
+    /** @return void */
+    private function registerPluginDescendant(string $handler)
+    {
         // check that handler class (or one of its ancestors, but not Plugin) actually redefines specific hooks,
         // so that we don't register empty handlers provided by Plugin
-
         $handlerClass = new \ReflectionClass($handler);
 
         if ($handlerClass->getMethod('afterMethodCallCheck')->getDeclaringClass()->getName() !== Plugin::class) {

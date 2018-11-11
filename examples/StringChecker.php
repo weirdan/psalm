@@ -7,8 +7,9 @@ use Psalm\Checker\StatementsChecker;
 use Psalm\CodeLocation;
 use Psalm\Context;
 use Psalm\FileManipulation\FileManipulation;
+use Psalm\PluginApi\Hook\AfterExpressionCheckInterface;
 
-class StringChecker extends \Psalm\Plugin
+class StringChecker implements AfterExpressionCheckInterface
 {
     /**
      * Called after an expression has been checked

@@ -7,21 +7,16 @@ use Psalm\FileManipulation\FileManipulation;
 use Psalm\Scanner\FileScanner;
 use Psalm\Storage\ClassLikeStorage;
 use Psalm\Type\Union;
+use Psalm\PluginApi\Hook;
 
-abstract class Plugin
+abstract class Plugin implements
+    Hook\AfterExpressionCheckInterface,
+    Hook\AfterStatementCheckInterface,
+    Hook\AfterVisitClassLikeInterface,
+    Hook\AfterClassLikeExistsCheckInterface,
+    Hook\AfterMethodCallCheckInterface,
+    Hook\AfterFunctionCallCheckInterface
 {
-    /**
-     * Called after an expression has been checked
-     *
-     * @param  StatementsChecker    $statements_checker
-     * @param  PhpParser\Node\Expr  $stmt
-     * @param  Context              $context
-     * @param  CodeLocation         $code_location
-     * @param  string[]             $suppressed_issues
-     * @param  FileManipulation[]   $file_replacements
-     *
-     * @return null|false
-     */
     public static function afterExpressionCheck(
         StatementsChecker $statements_checker,
         PhpParser\Node\Expr $stmt,
@@ -33,18 +28,6 @@ abstract class Plugin
         return null;
     }
 
-    /**
-     * Called after a statement has been checked
-     *
-     * @param  StatementsChecker                        $statements_checker
-     * @param  PhpParser\Node\Stmt|PhpParser\Node\Expr  $stmt
-     * @param  Context                                  $context
-     * @param  CodeLocation                             $code_location
-     * @param  string[]                                 $suppressed_issues
-     * @param  FileManipulation[]                       $file_replacements
-     *
-     * @return null|false
-     */
     public static function afterStatementCheck(
         StatementsChecker $statements_checker,
         PhpParser\Node $stmt,
@@ -56,11 +39,6 @@ abstract class Plugin
         return null;
     }
 
-    /**
-     * @param  FileManipulation[] $file_replacements
-     *
-     * @return void
-     */
     public static function afterVisitClassLike(
         PhpParser\Node\Stmt\ClassLike $stmt,
         ClassLikeStorage $storage,
@@ -70,12 +48,6 @@ abstract class Plugin
     ) {
     }
 
-    /**
-     * @param  string             $fq_class_name
-     * @param  FileManipulation[] $file_replacements
-     *
-     * @return void
-     */
     public static function afterClassLikeExistsCheck(
         StatementsSource $statements_source,
         $fq_class_name,
@@ -84,16 +56,6 @@ abstract class Plugin
     ) {
     }
 
-    /**
-     * @param  string $method_id - the method id being checked
-     * @param  string $appearing_method_id - the method id of the class that the method appears in
-     * @param  string $declaring_method_id - the method id of the class or trait that declares the method
-     * @param  string|null $var_id - a reference to the LHS of the variable
-     * @param  PhpParser\Node\Arg[] $args
-     * @param  FileManipulation[] $file_replacements
-     *
-     * @return void
-     */
     public static function afterMethodCallCheck(
         StatementsSource $statements_source,
         $method_id,
@@ -108,13 +70,6 @@ abstract class Plugin
     ) {
     }
 
-    /**
-     * @param  string $function_id - the method id being checked
-     * @param  PhpParser\Node\Arg[] $args
-     * @param  FileManipulation[] $file_replacements
-     *
-     * @return void
-     */
     public static function afterFunctionCallCheck(
         StatementsSource $statements_source,
         $function_id,

@@ -3,10 +3,11 @@ namespace Psalm\Example\Plugin;
 
 use Psalm\CodeLocation;
 use Psalm\FileManipulation\FileManipulation;
+use Psalm\PluginApi\Hook\AfterClassLikeExistsCheckInterface;
 use Psalm\StatementsSource;
 use Psalm\Type;
 
-class ClassUnqualifier extends \Psalm\Plugin
+class ClassUnqualifier implements AfterClassLikeExistsCheckInterface
 {
     /**
      * @param  string             $fq_class_name
