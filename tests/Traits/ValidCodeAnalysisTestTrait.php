@@ -72,8 +72,14 @@ trait ValidCodeAnalysisTestTrait
 
         $file_path = self::$src_dir_path . 'somefile.php';
 
+        /** @psalm-suppress UndefinedPropertyAssignment */
+        Config::getInstance()->parse_errors_unexpected = true;
+
         $this->addFile($file_path, $code);
         $this->analyzeFile($file_path, $context);
+
+        /** @psalm-suppress UndefinedPropertyFetch */
+        unset(Config::getInstance()->parse_errors_unexpected);
 
         $actual_vars = [];
         foreach ($assertions as $var => $_) {

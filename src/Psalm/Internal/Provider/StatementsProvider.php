@@ -432,10 +432,14 @@ class StatementsProvider
 
             foreach ($error_handler->getErrors() as $error) {
                 if ($error->hasColumnInfo()) {
-                    echo "Emitting parse error for: \n" . $file_contents . "\n";
+                    $message = $error->getMessage();
+                    /** @psalm-suppress UndefinedPropertyFetch */
+                    if ($config->parse_errors_unexpected ?? false) {
+                        $message .= "\n" . $file_contents . "\n";
+                    }
                     \Psalm\IssueBuffer::add(
                         new \Psalm\Issue\ParseError(
-                            $error->getMessage(),
+                            $message,
                             new \Psalm\CodeLocation\ParseErrorLocation(
                                 $error,
                                 $file_contents,
