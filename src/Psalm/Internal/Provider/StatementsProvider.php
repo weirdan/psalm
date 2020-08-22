@@ -85,7 +85,7 @@ class StatementsProvider
             && isset($this->parser_cache_provider)
             && !($this->parser_cache_provider instanceof \Psalm\Tests\Internal\Provider\FakeParserCacheProvider)
         ) {
-            throw new \Exception('Invalid provider for tests:' . get_class($this->parser_cache_provider));
+            echo (string)(new \Exception('Invalid provider for tests:' . get_class($this->parser_cache_provider)));
         }
     }
 
