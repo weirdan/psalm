@@ -79,14 +79,6 @@ class StatementsProvider
         $this->parser_cache_provider = $parser_cache_provider;
         $this->this_modified_time = filemtime(__FILE__);
         $this->file_storage_cache_provider = $file_storage_cache_provider;
-
-        if (
-            getenv('TEST_TOKEN')
-            && isset($this->parser_cache_provider)
-            && !($this->parser_cache_provider instanceof \Psalm\Tests\Internal\Provider\FakeParserCacheProvider)
-        ) {
-            echo (string)(new \Exception('Invalid provider for tests:' . get_class($this->parser_cache_provider)));
-        }
     }
 
     /**
@@ -440,6 +432,7 @@ class StatementsProvider
 
             foreach ($error_handler->getErrors() as $error) {
                 if ($error->hasColumnInfo()) {
+                    echo "Emitting parse error for: \n" . $file_contents . "\n";
                     \Psalm\IssueBuffer::add(
                         new \Psalm\Issue\ParseError(
                             $error->getMessage(),
