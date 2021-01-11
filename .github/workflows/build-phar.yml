@@ -40,4 +40,9 @@ jobs:
 
       - run: bin/build-phar.sh
 
-      - run: gh release upload "$GITHUB_REF" build/psalm.phar build/psalm.phar.asc --clobber
+      - name: Upload release assets
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/psalm.phar*
+          tag: ${{ github.ref }}
