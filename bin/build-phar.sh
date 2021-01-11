@@ -13,5 +13,5 @@ vendor/bin/box compile
 if [[ "$GPG_ENCRYPTION" != '' ]] ; then
     echo $GPG_ENCRYPTION | gpg --batch --passphrase-fd 0 keys.asc.gpg
     gpg --batch --yes --import keys.asc
-    echo $SIGNING_KEY | gpg --batch --passphrase-fd 0 -u 67FC14A4553D379C --armor --detach-sig build/psalm.phar
+    echo $SIGNING_KEY | gpg --batch --passphrase-fd 0 --pinentry-mode loopback -u 67FC14A4553D379C --armor --detach-sig build/psalm.phar
 fi
