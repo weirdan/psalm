@@ -11,7 +11,7 @@ php $DIR/improve_class_alias.php
 vendor/bin/box compile
 
 if [[ "$GPG_ENCRYPTION" != '' ]] ; then
-    echo $GPG_ENCRYPTION | gpg --passphrase-fd 0 keys.asc.gpg
+    echo $GPG_ENCRYPTION | gpg --batch --passphrase-fd 0 keys.asc.gpg
     gpg --batch --yes --import keys.asc
-    echo $SIGNING_KEY | gpg --passphrase-fd 0 -u 8A03EA3B385DBAA1 --armor --detach-sig build/psalm.phar
+    echo $SIGNING_KEY | gpg --batch --passphrase-fd 0 -u 51BDDA10E67212A00BFD8A4B67FC14A4553D379C --armor --detach-sig build/psalm.phar
 fi
