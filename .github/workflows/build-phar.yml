@@ -9,6 +9,8 @@ jobs:
   build-phar:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+
       - name: Get Composer Cache Directories
         id: composer-cache
         run: |
