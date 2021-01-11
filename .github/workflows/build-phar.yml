@@ -9,6 +9,12 @@ jobs:
   build-phar:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          tools: composer:v2
+
       - uses: actions/checkout@v2
 
       - name: Get Composer Cache Directories
