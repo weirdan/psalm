@@ -1,0 +1,35 @@
+name: Build phar
+
+on: 
+  release:
+    types:
+      - created
+
+jobs:
+  build-phar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Composer Cache Directories
+        id: composer-cache
+        run: |
+          echo "::set-output name=files_cache::$(composer config cache-files-dir)"
+          echo "::set-output name=vcs_cache::$(composer config cache-vcs-dir)"
+
+      - name: Cache composer cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ steps.composer-cache.outputs.files_cache }}
+            ${{ steps.composer-cache.outputs.vcs_cache }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Run composer install
+        run: composer install -o
+        env:
+          COMPOSER_ROOT_VERSION: dev-master
+
+      - run: bin/build-phar.sh
+
+      - run: gh release upload "$GITHUB_REF" build/psalm.phar build/psalm.phar.asc --clobber
