@@ -2,19 +2,10 @@
 
 namespace Psalm;
 
-gc_collect_cycles();
-gc_disable();
-
-// show all errors
-error_reporting(-1);
-
-require_once('command_functions.php');
-require_once __DIR__ . '/Psalm/Internal/Composer.php';
-require_once __DIR__ . '/Psalm/Internal/exception_handler.php';
-
 use Psalm\Exception\ConfigException;
 use Psalm\Internal\Analyzer\ProjectAnalyzer;
 use Psalm\Internal\Composer;
+use Psalm\Internal\ErrorHandler;
 use Psalm\Internal\Provider;
 use Psalm\Internal\IncludeCollector;
 use Psalm\Progress\DebugProgress;
@@ -62,7 +53,16 @@ use function array_merge;
 use function array_sum;
 use function gc_collect_cycles;
 use function gc_disable;
-use function error_reporting;
+
+gc_collect_cycles();
+gc_disable();
+
+require_once __DIR__ . '/Psalm/Internal/ErrorHandler.php';
+ErrorHandler::install();
+
+require_once('command_functions.php');
+require_once __DIR__ . '/Psalm/Internal/Composer.php';
+
 
 $valid_short_options = [
     'f:',
