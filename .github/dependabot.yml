@@ -1,6 +1,19 @@
 version: 2
+registries:
+  composer-root-version:
+    type: php-environment-variable
+    env-key: COMPOSER_ROOT_VERSION
+    env-value: dev-master
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+  - package-ecosystem: composer
+    directory: /
+    versioning-strategy: widen
+    schedule:
+      interval: weekly
+      day: friday
+      timezone: UTC
+      time: "22:00"
