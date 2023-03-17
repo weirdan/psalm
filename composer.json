@@ -24,7 +24,7 @@
         "ext-mbstring": "*",
         "ext-tokenizer": "*",
         "amphp/amp": "^2.4.2",
-        "amphp/byte-stream": "^1.5",
+        "amphp/byte-stream": "^1.5 || ^2.0",
         "composer-runtime-api": "^2",
         "composer/semver": "^1.4 || ^2.0 || ^3.0",
         "composer/xdebug-handler": "^2.0 || ^3.0",
