@@ -23,7 +23,7 @@
         "ext-libxml": "*",
         "ext-mbstring": "*",
         "ext-tokenizer": "*",
-        "amphp/amp": "^2.4.2",
+        "amphp/amp": "^2.4.2 || ^3.0.0",
         "amphp/byte-stream": "^1.5",
         "composer-runtime-api": "^2",
         "composer/semver": "^1.4 || ^2.0 || ^3.0",
