@@ -7,7 +7,12 @@
   "forkProcessing": "enabled",
   "packageRules": [
     {
-      "matchPackageNames": ["amphp/amp", "amphp/byte-stream", "amphp/phpunit-util"]
+      "matchPackageNames": ["amphp/amp", "amphp/byte-stream", "amphp/phpunit-util"],
+      "groupName": "amphp"
+    },
+    {
+      "matchPackagePrefixes": ["phpunit/", "sebastian/", "brianium/"],
+      "groupName": "phpunit"
     }
   ]
 }
