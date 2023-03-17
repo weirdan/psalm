@@ -8,7 +8,8 @@
   "packageRules": [
     {
       "matchPackageNames": ["amphp/amp", "amphp/byte-stream", "amphp/phpunit-util"],
-      "groupName": "amphp"
+      "groupName": "amphp",
+      "dependencyDashboardApproval": true
     },
     {
       "matchPackagePrefixes": ["phpunit/", "sebastian/", "brianium/"],
