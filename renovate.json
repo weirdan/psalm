@@ -4,5 +4,5 @@
     "config:base", ":dependencyDashboard"
   ],
   "rangeStrategy": "widen",
-  "includeForks": true
+  "forkProcessing": "enabled"
 }
