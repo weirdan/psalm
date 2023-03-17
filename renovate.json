@@ -4,5 +4,10 @@
     "config:base", ":dependencyDashboard"
   ],
   "rangeStrategy": "widen",
-  "forkProcessing": "enabled"
+  "forkProcessing": "enabled",
+  "packageRules": [
+    {
+      "matchPackageNames": ["amphp/amp", "amphp/byte-stream", "amphp/phpunit-util"]
+    }
+  ]
 }
