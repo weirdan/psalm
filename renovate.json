@@ -14,6 +14,11 @@
     {
       "matchPackagePrefixes": ["phpunit/", "sebastian/", "brianium/"],
       "groupName": "phpunit"
+    },
+    {
+      "matchPackageNames": ["thecodingmachine/php"],
+      "matchManagers": ["circleci"],
+      "enabled": false
     }
   ]
 }
