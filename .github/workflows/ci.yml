@@ -33,7 +33,7 @@ jobs:
           COMPOSER_ROOT_VERSION: dev-master
 
       - name: Cache composer cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: |
             ${{ steps.composer-cache.outputs.files_cache }}
@@ -114,7 +114,7 @@ jobs:
           COMPOSER_ROOT_VERSION: dev-master
 
       - name: Cache composer cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: |
             ${{ steps.composer-cache.outputs.files_cache }}
